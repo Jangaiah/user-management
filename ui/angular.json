@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "parking-ui": {
+    "user-management": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -17,7 +17,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/parking-ui",
+            "outputPath": "dist/user-management",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
@@ -76,10 +76,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "parking-ui:build:production"
+              "buildTarget": "user-management:build:production"
             },
             "development": {
-              "buildTarget": "parking-ui:build:development"
+              "buildTarget": "user-management:build:development"
             }
           },
           "defaultConfiguration": "development"

@@ -1,5 +1,5 @@
 {
-  "name": "parking-ui",
+  "name": "user-management",
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
@@ -8,7 +8,7 @@
     "build:prod": "ng build --configuration production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "serve:ssr:parking-ui": "node dist/parking-ui/server/server.mjs"
+    "serve:ssr:user-management": "node dist/user-management/server/server.mjs"
   },
   "private": true,
   "dependencies": {
