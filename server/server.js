@@ -14,7 +14,7 @@ try{
     await dbConnect();
     const corsOptions = {
       credentials: true,
-      origin: ['http://localhost:80','http://localhost:3000', 'http://localhost:4200', 'https://your-frontend-domain.com'] // Whitelist allowed origins
+      origin: ['http://localhost:80','http://localhost:3000', 'http://localhost:4200', 'https://main.d1o769dc8tk9gk.amplifyapp.com/'] // Whitelist allowed origins
     };
     app.disable('x-powered-by');
     app.use(cors(corsOptions));
