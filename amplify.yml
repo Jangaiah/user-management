@@ -8,8 +8,11 @@ applications:
         build:
           commands:
             - npm run build:prod
+            - mkdir -p dist/deploy
+            - cp -r dist/user-management/browser/* dist/deploy/
+            - mv dist/deploy/index.csr.html dist/deploy/index.html
       artifacts:
-        baseDirectory: /dist/user-management
+        baseDirectory: /dist/deploy
         files:
           - "**/*"
       cache:
