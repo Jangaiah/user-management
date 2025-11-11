@@ -5,6 +5,7 @@ import cors from "cors";
 import { userRouter } from './routers/user-routers.js';
 import { videoRouter } from './routers/video-routers.js';
 import { dbConnect } from "./controllers/connect-db.js";
+import { mfaRouter } from "./routers/mfa-router.js";
 
 try{
     dotenv.config();
@@ -20,6 +21,7 @@ try{
     app.use(cors(corsOptions));
     app.use(bodyParser.json());
     app.use('/api/user',userRouter);
+    app.use('/api/mfa',mfaRouter);
     app.use('/api/video',videoRouter);
 
     app.listen(port, host, () => {console.log(`Server is running on host: ${host} port: ${port}`);});

@@ -1,33 +1,34 @@
 import { NgIf } from '@angular/common';
 import { Component } from '@angular/core';
-import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms'; 
-import { UserService } from '../../services/user.service';
+import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { take, tap } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
+import { AuthService } from '../../services/auth/auth.service';
 
 @Component({
-  selector: 'app-add-user',
-  imports: [ReactiveFormsModule, NgIf, CommonModule],
+  selector: 'app-register-user',
+  imports: [ReactiveFormsModule, NgIf, CommonModule, RouterLink],
   providers: [ToastrService],
-  templateUrl: './add-user.component.html',
-  styleUrl: './add-user.component.scss'
+  templateUrl: './register-user.component.html',
+  styleUrl: './register-user.component.scss'
 })
-export class AddUserComponent {
-  myForm: FormGroup;
+export class RegisterUserComponent {
+ myForm: FormGroup;
   submitted: boolean = false; // Track submission for aria-live
   statusMessage: string = '';
   statusType: 'success' | 'error' | '' = '';
 
     constructor(
-      private userService: UserService,
+      private authService: AuthService,
       private toastr: ToastrService,
       private router: Router
     ) {
       this.myForm = new FormGroup({
         name: new FormControl('', Validators.required),
-        email: new FormControl('', [Validators.required, Validators.email])
+        email: new FormControl('', [Validators.required, Validators.email]),
+        password: new FormControl('', Validators.required)
       });
     }
 
@@ -35,7 +36,7 @@ export class AddUserComponent {
       this.submitted = true;
       if (this.myForm.valid) {
         const payload = this.myForm.value;
-        this.userService.addUser(payload)
+        this.authService.register(payload)
         .pipe(
           take(1),
           tap((data:any) => {
@@ -50,7 +51,8 @@ export class AddUserComponent {
             this.statusMessage = data?.message || 'Success message!';
             this.toastr.success('Success message!', data?.message);
             this.myForm.reset();
-            this.router.navigate(['/user-list']);
+            this.authService.setUserId(data.user._id);
+            this.router.navigate(['/setup-mfa']);
           }),
         )
         .subscribe();

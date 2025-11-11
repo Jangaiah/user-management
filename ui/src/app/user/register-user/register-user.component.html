@@ -1,4 +1,5 @@
 <div>
+  <h2>Register User</h2>
         <form [formGroup]="myForm" (ngSubmit)="onSubmit()">
       <div>
         <label for="name">Name:</label>
@@ -14,6 +15,11 @@
           Valid email is required.
         </div>
       </div>
-      <button type="submit" [disabled]="myForm.invalid">Add</button>
+      <div>
+        <label for="password">Password:</label>
+        <input type="password" id="password" formControlName="password">
+      </div>
+      <button type="submit" [disabled]="myForm.invalid">Register</button>
+      <a routerLink="/login" >Login</a>
     </form>
 </div>

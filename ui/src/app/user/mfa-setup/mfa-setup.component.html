@@ -1,0 +1,19 @@
+<div class="mfa-container" *ngIf="qrCode">
+      <h2>Setup MFA</h2>
+      <p>Scan this QR code with your Google Authenticator app:</p>
+      <img [src]="qrCode" alt="MFA QR Code" class="qr" />
+      <p>Then enter the 6-digit code below to verify:</p>
+
+      <form (ngSubmit)="verifyCode()">
+        <input type="text" [(ngModel)]="code" name="code" maxlength="6" required placeholder="Enter 6-digit code" />
+        <button type="submit">Verify</button>
+      </form>
+
+      <p *ngIf="message" [ngClass]="{'success': success, 'error': !success}">
+        {{ message }}
+      </p>
+    </div>
+
+    <div *ngIf="!qrCode">
+      <p>Loading MFA setup...</p>
+    </div>
