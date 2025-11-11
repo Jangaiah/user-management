@@ -15,9 +15,9 @@ export class NavBarComponent {
  userLoggedIn = false;
   currentLoggedInUser: Observable<User | null> = of(null);
   constructor(private authService: AuthService, private router: Router) {
+    this.currentLoggedInUser = this.authService.currentUser;
     if (this.authService.isLoggedIn) {
       this.userLoggedIn = true;
-      this.currentLoggedInUser = this.authService.currentUser;
     }
   }
   
