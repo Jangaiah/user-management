@@ -1,8 +1,8 @@
 import { CommonModule, NgIf } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
-import { Router, RouterLink, RouterModule } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth/auth.service';
 
 @Component({
@@ -12,8 +12,10 @@ import { AuthService } from '../../services/auth/auth.service';
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   myForm: FormGroup;
+  message: string = '';
+  success: boolean = false;
   constructor(
     private authService: AuthService,
     private toastr: ToastrService,
@@ -25,6 +27,15 @@ export class LoginComponent {
     });
   }
 
+  ngOnInit(): void {
+    const user = this.authService.getUser();
+    if (this.authService.isLoggedIn) {
+      this.router.navigate(['/user-list']);
+    } else if(user?.id && !user?.isMfaEnabled) {
+      this.router.navigate(['/setup-mfa']);
+    }
+  }
+
   onSubmit() {
     this.myForm.markAllAsTouched();
     if (this.myForm.valid) {
@@ -32,19 +43,23 @@ export class LoginComponent {
       this.authService.login(payload).subscribe({
         next: (data: any) => {
           if (data.status !== 1) {
-            this.toastr.error('Login Failed', data?.message || 'Error during login!');
+            this.message = data?.message || 'Error during login!';
+            this.success = false;
             return;
           }
+          this.success = true;
           this.toastr.success('Login Successful', data?.message || 'Welcome back!');
-          this.authService.setUserId(data.userId);
+          this.authService.setUser(data?.user);
           this.router.navigate(['/verify-mfa']);
         },
         error: (err: any) => {
-          this.toastr.error('Login Error', err?.message || 'An error occurred during login.');
+          this.success = false;
+          this.message = (err?.error?.message || err?.message ) || 'An error occurred during login.';
         }
       });
     } else {
-      this.toastr.error('Error', 'Please fill out all required fields correctly.');
+      this.success = false;
+      this.message = 'Please fill out all required fields correctly.';
     }
   }
 

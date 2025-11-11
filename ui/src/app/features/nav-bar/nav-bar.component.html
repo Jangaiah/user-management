@@ -1,0 +1,19 @@
+ <nav class="navbar">
+      <div class="nav-left">
+        <a routerLink="/" class="brand">Paneti's Portal</a>
+      </div>
+
+      <div class="nav-right" *ngIf="currentLoggedInUser | async as user; else loggedOut">
+        <a routerLink="/dashboard">Dashboard</a>
+        <a routerLink="/settings">Settings</a>
+        <a routerLink="/profile">{{user.name}}</a>
+        <button (click)="onLogout()">Logout</button>
+      </div>
+
+      <ng-template #loggedOut>
+        <div class="nav-right">
+          <a routerLink="/login">Login</a>
+          <a routerLink="/register">Register</a>
+        </div>
+      </ng-template>
+    </nav>

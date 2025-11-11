@@ -18,14 +18,14 @@ code = '';
   constructor(private authService: AuthService, private router: Router) {}
 
   verifyMfa() {
-    const userId = localStorage.getItem('userId');
-    if (!userId) {
+    const user = this.authService.getUser();
+    if (!user?.id && !user?.isMfaEnabled) {
       this.message = 'Session expired. Please login again.';
       this.success = false;
       return;
     }
 
-    this.authService.verifyMfa(userId, this.code).subscribe({
+    this.authService.verifyMfa(user?.id, this.code).subscribe({
       next: (res) => {
         this.message = res.message;
         this.success = true;

@@ -22,6 +22,12 @@ export const routes: Routes = [
         loadComponent: () => import('./user/login/login.component')
                         .then(c => c.LoginComponent)
     },
+    {
+        path: 'logout',
+        loadComponent: () => import('./features/logout/logout.component')
+                        .then(c => c.LogoutComponent),
+        canActivate: [authGuard]
+    },
     {   path: 'setup-mfa',
         loadComponent: () => import('./user/mfa-setup/mfa-setup.component')
                         .then(c => c.MfaSetupComponent),

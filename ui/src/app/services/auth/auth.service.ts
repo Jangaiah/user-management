@@ -1,8 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { map, Observable } from 'rxjs';
+import { BehaviorSubject, map, Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { StorageService } from '../storage/storage.service';
+import { User } from '../../common/models/user.model';
 
 @Injectable({
   providedIn: 'root'
@@ -11,10 +12,13 @@ export class AuthService {
 
   private baseUrlUser = `${environment.Endpoint}/user`;
   private baseUrlMfa = `${environment.Endpoint}/mfa`;
-  private storage?: Storage;
+  private currentUserSubject: BehaviorSubject<User | null>;
+  public currentUser: Observable<User | null>;
 
-  constructor(private http: HttpClient, private storageService: StorageService) {
-    this.storage = this.storageService.getStorageType();
+  constructor(private http: HttpClient, private storage: StorageService) {
+    const userJson = this.storage?.getItem('currentUser');
+    this.currentUserSubject = new BehaviorSubject<any>(userJson ? JSON.parse(userJson) : null);
+    this.currentUser = this.currentUserSubject.asObservable();
   }
 
   // 🧾 Register user
@@ -23,11 +27,13 @@ export class AuthService {
     return this.http.post(`${this.baseUrlUser}/register`, { name, email, password });
   }
 
-  setUserId(userId: string): void {
-    this.storage?.setItem('userId', userId);
+  setUser(user: User): void {
+    const _user = this.storage?.getObject<User>('currentUser') || {} as User;
+    this.storage?.setObject('currentUser', {..._user, ...user });
   }
-  getUserId(): string | null | undefined {
-    return this.storage?.getItem('userId');
+
+  getUser(): User | null {
+    return this.storage?.getObject<User>('currentUser');
   }
 
   // 🔑 Login (Step 1: password)
@@ -39,8 +45,8 @@ export class AuthService {
           // temporary token before MFA
           this.storage?.setItem('tempToken', response.token);
         }
-        if (response?.userId) {
-          this.storage?.setItem('userId', response.userId);
+        if (response?.user) {
+          this.setUser(response.user as User);
         }
         return response;
       })
@@ -52,6 +58,10 @@ export class AuthService {
     return this.http.get(`${this.baseUrlMfa}/generate-mfa/${userId}`);
   }
 
+  verifyMfaSetup(userId: string, token: string) {
+    return this.http.post<any>(`${this.baseUrlMfa}/verify-mfa-setup`, { userId, token });
+  }
+
   // ✅ Verify MFA (Step 3)
   verifyMfa(userId: string, token: string): Observable<any> {
     return this.http.post(`${this.baseUrlMfa}/verify-mfa`, { userId, token }).pipe(
@@ -59,24 +69,41 @@ export class AuthService {
         if (response?.token) {
           // Store final JWT for the session
           this.storage?.setItem('authToken', response.token);
-          this.storage?.setItem('currentUser', JSON.stringify(response.user));
+          this.setUser(response.user);
+          const user = JSON.parse(JSON.stringify(response.user || '{}'));
+          this.currentUserSubject.next(response.user);
         }
         return response;
       })
     );
   }
 
-  // 🔐 Check login status
+  //  Check login status
   get isLoggedIn(): boolean {
     return !!this.storage?.getItem('authToken');
   }
 
-  // 🧹 Logout
-  logout(): void {
-    this.storage?.removeItem('authToken');
-    this.storage?.removeItem('tempToken');
-    this.storage?.removeItem('userId');
-    this.storage?.removeItem('currentUser');
+  isTokenExpired(): boolean {
+    const token = this.storage?.getItem('authToken');
+    if (!token) return true;
+
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload.exp * 1000 < Date.now();
+  }
+
+  //  Logout
+  logout(): Observable<any> {
+    return this.http.post(`${this.baseUrlUser}/logout`, {})
+      .pipe(
+        tap(() => {
+          this.clearStorage();
+        })
+      );
+  }
+
+  clearStorage(): void {
+    this.storage?.clear();
+    this.currentUserSubject.next(null);
   }
 
 }

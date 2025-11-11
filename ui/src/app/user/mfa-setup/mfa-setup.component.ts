@@ -20,9 +20,9 @@ export class MfaSetupComponent {
   constructor(private authService: AuthService, private router: Router) {}
 
   ngOnInit() {
-    const userId = this.authService.getUserId();
-    if (userId) {
-      this.authService.generateMfa(userId).subscribe({
+    const user = this.authService.getUser();
+    if (user?.id) {
+      this.authService.generateMfa(user?.id).subscribe({
         next: (res) => {
           this.qrCode = res.qr;
         },
@@ -36,13 +36,14 @@ export class MfaSetupComponent {
   }
 
   verifyCode() {
-    const userId =  this.authService.getUserId();
-    if (!userId) return;
+    const user =  this.authService.getUser();
+    if (!user?.id) return;
 
-    this.authService.verifyMfa(userId, this.code).subscribe({
+    this.authService.verifyMfaSetup(user?.id, this.code).subscribe({
       next: (res) => {
         this.message = res.message;
         this.success = true;
+        this.authService.setUser(res.user);
         setTimeout(() => this.router.navigate(['/login']), 1500);
       },
       error: (err) => {

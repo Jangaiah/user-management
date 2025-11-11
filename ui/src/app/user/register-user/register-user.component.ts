@@ -1,5 +1,5 @@
 import { NgIf } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { take, tap } from 'rxjs';
 import { CommonModule } from '@angular/common';
@@ -14,7 +14,7 @@ import { AuthService } from '../../services/auth/auth.service';
   templateUrl: './register-user.component.html',
   styleUrl: './register-user.component.scss'
 })
-export class RegisterUserComponent {
+export class RegisterUserComponent implements OnInit{
  myForm: FormGroup;
   submitted: boolean = false; // Track submission for aria-live
   statusMessage: string = '';
@@ -31,6 +31,12 @@ export class RegisterUserComponent {
         password: new FormControl('', Validators.required)
       });
     }
+
+    ngOnInit(): void {
+    if (this.authService.isLoggedIn) {
+      this.router.navigate(['/user-list']);
+    }
+  }
 
     onSubmit() {
       this.submitted = true;
@@ -51,7 +57,7 @@ export class RegisterUserComponent {
             this.statusMessage = data?.message || 'Success message!';
             this.toastr.success('Success message!', data?.message);
             this.myForm.reset();
-            this.authService.setUserId(data.user._id);
+            this.authService.setUser(data?.user);
             this.router.navigate(['/setup-mfa']);
           }),
         )

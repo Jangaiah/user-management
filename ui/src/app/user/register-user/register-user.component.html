@@ -1,23 +1,26 @@
-<div>
+<div  class="register-container">
   <h2>Register User</h2>
         <form [formGroup]="myForm" (ngSubmit)="onSubmit()">
       <div>
         <label for="name">Name:</label>
         <input type="text" id="name" formControlName="name">
-        <div *ngIf="myForm.get('name')?.invalid && myForm.get('name')?.touched">
+        <div *ngIf="myForm.get('name')?.invalid && myForm.get('name')?.touched" class="error">
           Name is required.
         </div>
       </div>
       <div>
         <label for="email">Email:</label>
         <input type="email" id="email" formControlName="email">
-        <div *ngIf="myForm.get('email')?.invalid && myForm.get('email')?.touched">
+        <div *ngIf="myForm.get('email')?.invalid && myForm.get('email')?.touched" class="error">
           Valid email is required.
         </div>
       </div>
       <div>
         <label for="password">Password:</label>
         <input type="password" id="password" formControlName="password">
+        <div *ngIf="myForm.get('password')?.invalid && myForm.get('password')?.touched" class="error">
+          Password is required.
+        </div>
       </div>
       <button type="submit" [disabled]="myForm.invalid">Register</button>
       <a routerLink="/login" >Login</a>

@@ -5,16 +5,14 @@ import { UserService } from '../../services/user.service';
 import { AllCommunityModule, ModuleRegistry, RowSelectionModule, RowSelectionOptions } from 'ag-grid-community'; 
 import { AgGridAngular } from 'ag-grid-angular'; // Angular Data Grid Component
 import type { ColDef } from 'ag-grid-community';
-import { RouterLink } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import { environment } from '../../../environments/environment';
 
 // Register all Community features
 ModuleRegistry.registerModules([AllCommunityModule, RowSelectionModule]);
 
 @Component({
   selector: 'app-user-list',
-  imports: [AsyncPipe, AgGridAngular, RouterLink],
+  imports: [AsyncPipe, AgGridAngular],
   templateUrl: './user-list.component.html',
   styleUrl: './user-list.component.scss',
   standalone: true

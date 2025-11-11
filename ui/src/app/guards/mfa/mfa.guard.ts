@@ -5,8 +5,8 @@ import { inject } from '@angular/core';
 export const mfaGuard: CanActivateFn = (route, state) => {
   const authService = inject(AuthService);
     const router = inject(Router);
-    const userId = authService.getUserId();
-    if (!userId) {
+    const user = authService.getUser();
+    if (!user?.id) {
       router.navigate(['/login']);
       return false;
     }
