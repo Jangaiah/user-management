@@ -49,7 +49,6 @@ export class LoginComponent implements OnInit {
           }
           this.success = true;
           this.toastr.success('Login Successful', data?.message || 'Welcome back!');
-          this.authService.setUser(data?.user);
           this.router.navigate(['/verify-mfa']);
         },
         error: (err: any) => {
