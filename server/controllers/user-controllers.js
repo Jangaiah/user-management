@@ -1,8 +1,10 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
-
+import { env } from '../config/config.js';
 import User from '../models/user.js'
 import Blacklist from '../models/black-list.js';
+
+const jwtSecret = env.jwtSecret;
 
 export const getAllUsers = async (req, res) => {
     try{
@@ -51,7 +53,7 @@ export const loginUser = async (req, res) => {
   if (!valid) return res.status(400).json({ message: "Invalid credentials" });
 
   // Generate temporary token for MFA step
-  const token = jwt.sign({ id: user._id }, "secret", { expiresIn: "5m" });
+  const token = jwt.sign({ id: user._id, email: user.email, role: user.role }, jwtSecret, { expiresIn: "5m" });
 
   res.json({ status: 1, message: "Password verified, continue MFA", token, user: { id: user._id, isMfaEnabled: user.isMfaEnabled } });
 };

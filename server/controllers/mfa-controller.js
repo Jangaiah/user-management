@@ -2,6 +2,9 @@ import speakeasy from 'speakeasy';
 import jwt from 'jsonwebtoken';
 import qrcode from 'qrcode';
 import User from "../models/user.js";
+import { env } from '../config/config.js'
+
+const jwtSecret = env.jwtSecret;
 
 export const generateMFA = async (req, res) => {
   const user = await User.findById(req.params.id);
@@ -49,6 +52,6 @@ export const verifyMFA = async (req, res) => {
 
   if (!verified) return res.status(400).json({ message: "Invalid MFA code" });
 
-  const authToken = jwt.sign({ id: user._id }, "secret", { expiresIn: "1h" });
+  const authToken = jwt.sign({ id: user._id, email: user.email, role: user.role }, jwtSecret, { expiresIn: "1h" });
   res.json({ message: "Login success", token: authToken, user : { id: user._id, name: user.name, email: user.email, isMfaEnabled: user.isMfaEnabled } } );
 };

@@ -1,17 +1,16 @@
 import express from "express";
-import dotenv from 'dotenv';
 import bodyParser from "body-parser";
 import cors from "cors";
+import { env } from './config/config.js';
 import { userRouter } from './routers/user-routers.js';
 import { videoRouter } from './routers/video-routers.js';
 import { dbConnect } from "./controllers/connect-db.js";
 import { mfaRouter } from "./routers/mfa-router.js";
 
 try{
-    dotenv.config();
     const app = express();
-    const port = process.env.PORT;
-    const host = process.env.HOST || '0.0.0.0';
+    const port = env.port || 3000;
+    const host = env.host || '0.0.0.0';
     await dbConnect();
     const corsOptions = {
       credentials: true,
